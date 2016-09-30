@@ -6,7 +6,7 @@
 <!-- TODO:: api key 백엔드에서 받아야함 -->
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYz-hHmnLkZszDc-DeKoFplyBSrjrEsao"></script>
+<script src="http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}"></script>
 
 <div id="container">
     <div id="mapWrapper"></div>
@@ -153,7 +153,7 @@
                 var width = $('#hSize').val() + $('#hSize').parent().find('.text-measure').text();
                 var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
 
-                appendToolContent('<div id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:' + width + ';height:' + height + '"></div>', function() {
+                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:' + width + ';height:' + height + '"></div>', function() {
 
                     var loadCallback = function() {
 
@@ -182,7 +182,7 @@
                     if(editorWindow.google) {
                         loadCallback();
                     }else {
-                        _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key=AIzaSyBYz-hHmnLkZszDc-DeKoFplyBSrjrEsao', loadCallback);
+                        _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}', loadCallback);
                     }
                 });
             },

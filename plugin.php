@@ -40,13 +40,15 @@ class Plugin extends AbstractPlugin
                             XeFrontend::title($title);
 
                             // load css file
-                            XeFrontend::css($this->asset('assets/style.css'))->load();
+//                            XeFrontend::css($this->asset('assets/style.css'))->load();
 
                             //header, footer 제거
                             \XeTheme::selectBlankTheme();
 
+                            $config = \XeConfig::getOrNew('google_map_tool');
+
                             // output
-                            return XePresenter::make('google_map_tool::views.popup', ['title' => $title]);
+                            return XePresenter::make('google_map_tool::views.popup', ['config' => $config]);
 
                         }
                     ]
@@ -55,6 +57,9 @@ class Plugin extends AbstractPlugin
         );
 
         Route::settings($this->getId(), function () {
+            Route::get('setting', ['as' => 'settings.plugin.google_map_tool.global', 'uses' => 'SettingsController@getGlobal']);
+            Route::post('setting', ['as' => 'settings.plugin.google_map_tool.global', 'uses' => 'SettingsController@postGlobal']);
+            
             Route::get('setting/{instanceId}', ['as' => 'settings.plugin.google_map_tool.setting', 'uses' => 'SettingsController@getSetting']);
             Route::post('setting/{instanceId}', ['as' => 'settings.plugin.google_map_tool.setting', 'uses' => 'SettingsController@postSetting']);
         }, ['namespace' => __NAMESPACE__]);
@@ -128,4 +133,8 @@ class Plugin extends AbstractPlugin
         return true;
     }
 
+    public function getSettingsURI()
+    {
+        return route('settings.plugin.google_map_tool.global');
+    }
 }

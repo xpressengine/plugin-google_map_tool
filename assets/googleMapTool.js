@@ -71,7 +71,25 @@ XEeditor.tools.define({
                 if(editorWindow.google) {
                     loadCallback();
                 }else {
-                    _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key=AIzaSyBYz-hHmnLkZszDc-DeKoFplyBSrjrEsao', loadCallback);
+                    var getParam = function () {
+                        var qs = $('script[src*="googleMapTool.js"]').attr('src').replace(/^[^\?]+\??/, '');
+
+                        return (function ( query ) {
+                            var Params = {};
+                            if ( ! query ) return Params; // return empty object
+                            var Pairs = query.split(/[;&]/);
+                            for ( var i = 0; i < Pairs.length; i++ ) {
+                                var KeyVal = Pairs[i].split('=');
+                                if ( ! KeyVal || KeyVal.length != 2 ) continue;
+                                var key = unescape( KeyVal[0] );
+                                var val = unescape( KeyVal[1] );
+                                val = val.replace(/\+/g, ' ');
+                                Params[key] = val;
+                            }
+                            return Params;
+                        })(qs);
+                    };
+                    _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key=' + getParam()['key'], loadCallback);
                 }
             }
         }
