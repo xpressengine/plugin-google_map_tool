@@ -1,0 +1,47 @@
+{
+  "name": "xpressengine-plugin/google_map_tool",
+  "description": "This Package is Xpressengine Plugin - google map tool for editor.",
+  "keywords": [
+    "xpressengine",
+    "plugin"
+  ],
+  "license": "LGPL-2.0",
+  "version": "1.0.0",
+  "type": "xpressengine-plugin",
+  "support": {
+    "email": "input@your.email"
+  },
+  "authors": [
+    {
+      "name": "input your name",
+      "email": "input@your.email",
+      "homepage": "http://input.your.site",
+      "role": "Developer"
+    }
+  ],
+  "extra": {
+    "xpressengine": {
+      "title": "Google map tool for editor",
+      "component": {
+        "editortool/googlemap@googlemap": {
+          "class": "Xpressengine\\Plugins\\GoogleMapTool\\GoogleMapTool",
+          "name": "Google map tool for editor",
+          "description": "에디터에 구글지도를 삽입해줌"
+        }
+      }
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packagist.xpressengine.io/"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Xpressengine\\Plugins\\GoogleMapTool\\": "src/"
+    }
+  }
+}
