@@ -3,7 +3,7 @@ XEeditor.tools.define({
     events: {
         iconClick: function(targetEditor, cbAppendToolContent) {
 
-            var cWindow = window.open(googleToolURL.get('popup'), 'test', "width=750,height=900,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
+            var cWindow = window.open(googleToolURL.get('popup'), 'test', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
 
             $(cWindow).on('load', function() {
                 cWindow.targetEditor = targetEditor;
@@ -36,7 +36,7 @@ XEeditor.tools.define({
 
                 targetDoc.head.appendChild(el);
             };
-            
+
             if($(targetEditor.document.$.querySelectorAll('[data-googlemap]')).length > 0) {
 
                 var loadCallback = function() {

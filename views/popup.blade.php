@@ -15,9 +15,19 @@
         <div class="panel-body">
             <div class="form-group">
                 <label for="content">Marker 내용 <small class="text-primary">(HTML사용 가능)</small></label>
-                <textarea id="content" placeholder="" ></textarea>
+                <textarea id="content" placeholder="마커에 표시할 내용을 입력하세요." ></textarea>
             </div>
-
+            <div class="form-group">
+                <label for="useFullHorizontal">가로 넓이</label>
+                <input type="number" id="hSize" pattern="[0-2000]" min="0" max="10000" />&nbsp;<small class="text-measure">px</small>
+                |
+                <label for="useFullHorizontal"><small class="text-success">가로 넓이 100% 유지</small></label>
+                <input type="checkbox" id="checkFullWidth" />
+            </div>
+            <div class="form-group">
+                <label for="vSize">세로 넓이</label>
+                <input type="number" id="vSize" pattern="[0-2000]" min="0" max="10000" />&nbsp;<small class="text-measure">px</small>
+            </div>
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-left">
@@ -29,134 +39,181 @@
 
         </div>
     </div>
-    <div>
-        <input type="hidden" id="markerText" />
-        <input type="hidden" id="latitude" />
-        <input type="hidden" id="longitude" />
-    </div>
 </div>
 
 
 <script type="text/javascript">
 
-    var defaultText = '입력하세요';
-    var text = '';
-    var map = new google.maps.Map(document.getElementById('mapWrapper'), {
-        center: new google.maps.LatLng('37.566535', '126.97796919999996'),
-        zoom: 10,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
+    (function() {
+        var defaultText = '입력하세요';
+        var text = '', mapWidth = 0, mapHeight = 0;
+        var selfObj;
+        var map, marker, infowindow;
 
-    var myLatLng = new google.maps.LatLng('37.566535', '126.97796919999996');
-    var marker = new google.maps.Marker({
-        position: myLatLng,
-        map: map
-    });
+        var _jsLoad = function(targetDoc, src, load, error) {
+            var el = targetDoc.createElement( 'script' );
 
-    var infowindow = new google.maps.InfoWindow({
-        content: defaultText
-    });
+            el.src = src;
+            el.async = true;
 
-    var _jsLoad = function(targetDoc, src, load, error) {
-        var el = targetDoc.createElement( 'script' );
+            if(load) {
+                el.onload = load;
+            }
 
-        el.src = src;
-        el.async = true;
+            if(error) {
+                el.onerror = error;
+            }
 
-        if(load) {
-            el.onload = load;
+            targetDoc.head.appendChild(el);
+        };
+
+        var _generateUUID = function() {
+            var d = new Date().getTime();
+            if(window.performance && typeof window.performance.now === "function"){
+                d += performance.now(); //use high-precision timer if available
+            }
+            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random()*16)%16 | 0;
+                d = Math.floor(d/16);
+                return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            });
+            return uuid;
         }
 
-        if(error) {
-            el.onerror = error;
-        }
+        return {
+            init: function() {
+                selfObj = this;
 
-        targetDoc.head.appendChild(el);
-    };
+                var myLatLng = new google.maps.LatLng('37.566535', '126.97796919999996');
 
-    var _generateUUID = function() {
-        var d = new Date().getTime();
-        if(window.performance && typeof window.performance.now === "function"){
-            d += performance.now(); //use high-precision timer if available
-        }
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (d + Math.random()*16)%16 | 0;
-            d = Math.floor(d/16);
-            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-        });
-        return uuid;
-    }
-
-    infowindow.open(map, marker);
-
-    google.maps.event.addListener(map, 'click', function(event) {
-        marker.setPosition(event.latLng);
-        map.setCenter(event.latLng);
-    });
-
-    google.maps.event.addListener(marker, 'click', function() {
-        infowindow.open(map, marker);
-    });
-
-    $('#content').on('keyup', function(e) {
-        var $this = $(this);
-
-        text = $this.val();
-
-        if($this.val() === '') {
-            infowindow.setContent(defaultText);
-        }else {
-            infowindow.setContent(text);
-        }
-    });
-
-    $(window).on('load', function() {
-        if(!self.appendToolContent) {
-            alert('팝업을 재실행 하세요.');
-            self.close();
-        }
-    });
-
-    $('#btnAppendToEditor').on('click', function() {
-        var lat = marker.getPosition().lat();
-        var lng = marker.getPosition().lng();
-
-        var editorDoc = self.targetEditor.document.$;
-        var editorWindow = self.targetEditor.window.$;
-        var uuid = _generateUUID();
-
-        appendToolContent('<div id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:100%;height:300px;"></div>', function() {
-
-            var loadCallback = function() {
-
-                var map = new editorWindow.google.maps.Map(editorDoc.getElementById('googlemap_' + uuid), {
-                    center: new editorWindow.google.maps.LatLng(lat, lng),
+                map = new google.maps.Map(document.getElementById('mapWrapper'), {
+                    center: new google.maps.LatLng('37.566535', '126.97796919999996'),
                     zoom: 10,
-                    mapTypeId: editorWindow.google.maps.MapTypeId.ROADMAP
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
                 });
 
-                var myLatLng = new editorWindow.google.maps.LatLng(lat, lng);
-                var marker = new editorWindow.google.maps.Marker({
+                marker = new google.maps.Marker({
                     position: myLatLng,
                     map: map
                 });
 
-                editorWindow.infowindow = new editorWindow.google.maps.InfoWindow({
-                    content: text
+                infowindow = new google.maps.InfoWindow({
+                    content: defaultText
                 });
 
-                editorWindow.infowindow.open(map, marker);
+                infowindow.open(map, marker);
 
-                self.close();
+                selfObj.bindEvent();
 
-            };
+                return this;
+            },
+            bindEvent: function() {
+                google.maps.event.addListener(map, 'click', function(event) {
+                    marker.setPosition(event.latLng);
+//                    map.setCenter(event.latLng);
+                });
 
-            if(editorWindow.google) {
-                loadCallback();
-            }else {
-                _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key=AIzaSyBYz-hHmnLkZszDc-DeKoFplyBSrjrEsao', loadCallback);
+                google.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
+                });
+
+                $(window).on('load', selfObj.preventReloading);
+                $('#content').on('keyup', selfObj.setContent);
+                $('#checkFullWidth').on('change', selfObj.checkFullWidth);
+                $('#btnAppendToEditor').on('click', function() {
+                    if(selfObj.isValid()) {
+                        selfObj.appendToEditor();
+                    }
+                });
+            },
+            preventReloading: function() {
+                if(!self.appendToolContent) {
+                    alert('팝업을 재실행 하세요.');
+                    self.close();
+                }
+            },
+            setContent: function(e) {
+                var $this = $(this);
+
+                text = $this.val();
+
+                if($this.val() === '') {
+                    infowindow.setContent(defaultText);
+                }else {
+                    infowindow.setContent(text);
+                }
+            },
+            appendToEditor: function() {
+                var lat = marker.getPosition().lat();
+                var lng = marker.getPosition().lng();
+
+                var editorDoc = self.targetEditor.document.$;
+                var editorWindow = self.targetEditor.window.$;
+                var uuid = _generateUUID();
+                var width = $('#hSize').val() + $('#hSize').parent().find('.text-measure').text();
+                var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
+
+                appendToolContent('<div id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:' + width + ';height:' + height + '"></div>', function() {
+
+                    var loadCallback = function() {
+
+                        var map = new editorWindow.google.maps.Map(editorDoc.getElementById('googlemap_' + uuid), {
+                            center: new editorWindow.google.maps.LatLng(lat, lng),
+                            zoom: 10,
+                            mapTypeId: editorWindow.google.maps.MapTypeId.ROADMAP
+                        });
+
+                        var myLatLng = new editorWindow.google.maps.LatLng(lat, lng);
+                        var marker = new editorWindow.google.maps.Marker({
+                            position: myLatLng,
+                            map: map
+                        });
+
+                        editorWindow.infowindow = new editorWindow.google.maps.InfoWindow({
+                            content: text
+                        });
+
+                        editorWindow.infowindow.open(map, marker);
+
+                        self.close();
+
+                    };
+
+                    if(editorWindow.google) {
+                        loadCallback();
+                    }else {
+                        _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key=AIzaSyBYz-hHmnLkZszDc-DeKoFplyBSrjrEsao', loadCallback);
+                    }
+                });
+            },
+            checkFullWidth: function() {
+                var $this = $(this);
+
+                if($this.prop('checked')) {
+                    $('#hSize').prop('disabled', true);
+                    $('#hSize').val(100);
+                    $('#hSize').parent().find('.text-measure').text('%');
+                }else {
+                    $('#hSize').prop('disabled', false);
+                    $('#hSize').val('');
+                    $('#hSize').parent().find('.text-measure').text('px');
+                }
+            },
+            isValid: function() {
+                if($('#content').val() === '') {
+                    alert('Marker 표시 내용을 입력하세요.');
+                    return false;
+                }else if($('#hSize').val() === '') {
+                    alert('가로 넓이를 입력하세요.');
+                    return false;
+                }else if($('#vSize').val() === '') {
+                    alert('세로 넓이를 입력하세요.');
+                    return false;
+                }
+
+                return true;
             }
-        });
-    });
+        }
+    })().init();
 
 </script>
