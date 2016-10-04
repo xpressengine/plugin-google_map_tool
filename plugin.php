@@ -29,7 +29,7 @@ class Plugin extends AbstractPlugin
             $this->getId(),
             function () {
                 Route::get(
-                    '/',
+                    '/popup/create',
                     [
                         'as' => 'google_map_tool::popup',
                         'uses' => function (Request $request) {
@@ -54,6 +54,32 @@ class Plugin extends AbstractPlugin
 
                             // output
                             return XePresenter::make('google_map_tool::views.popup', ['config' => $config]);
+
+                        }
+                    ]
+                );
+
+                Route::get(
+                    '/popup/edit',
+                    [
+                        'as' => 'google_map_tool::popup.edit',
+                        'uses' => function (Request $request) {
+
+                            $title = 'google map tool for editor';
+
+                            // set browser title
+                            XeFrontend::title($title);
+
+                            // load css file
+                            XeFrontend::css($this->asset('assets/style.css'))->load();
+
+                            //header, footer 제거
+                            \XeTheme::selectBlankTheme();
+
+                            $config = \XeConfig::getOrNew('google_map_tool');
+
+                            // output
+                            return XePresenter::make('google_map_tool::views.popup-edit', ['config' => $config]);
 
                         }
                     ]

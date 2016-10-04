@@ -48,12 +48,14 @@
     $.fn['renderer'] = function (options) {
         var options = options || {},
             win = options.win || window,
+            callback = options.callback || function () {},
             $tar = this instanceof jQuery ? this : $(this);
 
-        var render = function (tar, win) {
+        var render = function (tar, win, callback) {
             var lat = $(tar).data('lat');
             var lng = $(tar).data('lng');
             var text = $(tar).data('text').toString();
+            var zoom = $(tar).data('zoom') || 10;
 
             var map = new win.google.maps.Map(tar, {
                 center: new win.google.maps.LatLng(lat, lng),
@@ -72,11 +74,13 @@
             });
 
             infowindow.open(map, marker);
+
+            callback(tar);
         };
 
         var act = function () {
             $tar.each(function () {
-                render(this, win);
+                render(this, win, callback);
             });
         };
 

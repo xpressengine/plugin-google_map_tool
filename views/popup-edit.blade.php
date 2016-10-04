@@ -3,8 +3,10 @@
     #mapWrapper { width: 500px; height: 500px;}
     #content {width: 100%; height: 80px;}
 </style>
-
+<!-- TODO:: api key 백엔드에서 받아야함 -->
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+<script src="http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}"></script>
 
 <div id="container">
     <div id="mapWrapper"></div>
@@ -48,6 +50,23 @@
         var selfObj;
         var map, marker, infowindow;
 
+        var _jsLoad = function(targetDoc, src, load, error) {
+            var el = targetDoc.createElement( 'script' );
+
+            el.src = src;
+            el.async = true;
+
+            if(load) {
+                el.onload = load;
+            }
+
+            if(error) {
+                el.onerror = error;
+            }
+
+            targetDoc.head.appendChild(el);
+        };
+
         var _generateUUID = function() {
             var d = new Date().getTime();
             if(window.performance && typeof window.performance.now === "function"){
@@ -65,11 +84,11 @@
             init: function() {
                 selfObj = this;
 
-                var myLatLng = new google.maps.LatLng('{{ $config->get('lat') }}', '{{ $config->get('lng') }}');
+                var myLatLng = new google.maps.LatLng('37.566535', '126.97796919999996');
 
                 map = new google.maps.Map(document.getElementById('mapWrapper'), {
-                    center: myLatLng,
-                    zoom: parseInt('{{ $config->get('zoom') }}'),
+                    center: new google.maps.LatLng('37.566535', '126.97796919999996'),
+                    zoom: 10,
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                 });
 
@@ -135,9 +154,37 @@
                 var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
                 var zoom = map.getZoom();
 
-                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:' + width + ';height:' + height + '"></div>', function() {
-                    $(editorDoc.getElementById('googlemap_' + uuid)).renderer({win: editorWindow});
-                    self.close();
+                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" data-zoom="' + zoom + '" style="width:' + width + ';height:' + height + '"></div>', function() {
+
+                    var loadCallback = function() {
+
+                        var map = new editorWindow.google.maps.Map(editorDoc.getElementById('googlemap_' + uuid), {
+                            center: new editorWindow.google.maps.LatLng(lat, lng),
+                            zoom: zoom,
+                            mapTypeId: editorWindow.google.maps.MapTypeId.ROADMAP
+                        });
+
+                        var myLatLng = new editorWindow.google.maps.LatLng(lat, lng);
+                        var marker = new editorWindow.google.maps.Marker({
+                            position: myLatLng,
+                            map: map
+                        });
+
+                        editorWindow.infowindow = new editorWindow.google.maps.InfoWindow({
+                            content: text
+                        });
+
+                        editorWindow.infowindow.open(map, marker);
+
+                        self.close();
+
+                    };
+
+                    if(editorWindow.google) {
+                        loadCallback();
+                    }else {
+                        _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}', loadCallback);
+                    }
                 });
             },
             checkFullWidth: function() {
