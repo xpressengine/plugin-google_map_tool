@@ -30,7 +30,8 @@ class GoogleMapTool extends AbstractTool
             (function() {
             
                 var _url = {
-                    popup: '".route('google_map_tool::popup')."'                
+                    popup: '".route('google_map_tool::popup')."',      
+                    edit_popup: '".route('google_map_tool::popup.edit')."'
                 };
             
                 var URL = {

@@ -3,7 +3,7 @@ XEeditor.tools.define({
     events: {
         iconClick: function(targetEditor, cbAppendToolContent) {
 
-            var cWindow = window.open(googleToolURL.get('popup'), 'test', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
+            var cWindow = window.open(googleToolURL.get('popup'), 'createPopup', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
 
             $(cWindow).on('load', function() {
                 cWindow.targetEditor = targetEditor;
@@ -47,10 +47,11 @@ XEeditor.tools.define({
                         var lat = $this.data('lat');
                         var lng = $this.data('lng');
                         var text = $this.data('text');
+                        var zoom = $this.data('zoom') || 10;
 
                         var map = new editorWindow.google.maps.Map(editorDoc.getElementById(id), {
                             center: new editorWindow.google.maps.LatLng(lat, lng),
-                            zoom: 10,
+                            zoom: zoom,
                             mapTypeId: editorWindow.google.maps.MapTypeId.ROADMAP
                         });
 
@@ -65,6 +66,19 @@ XEeditor.tools.define({
                         });
 
                         editorWindow.infowindow.open(map, marker);
+
+                        $this.prepend('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>');
+                    });
+
+                    $(targetEditor.document.$.querySelectorAll('[data-googlemap]')).on('click', '.btnEditMap', function() {
+                        var cWindow = window.open(googleToolURL.get('edit_popup'), 'editPopup', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
+                        var $this = $(this)[0];
+
+                        $(cWindow).on('load', function() {
+                            cWindow.targetEditor = targetEditor;
+                            cWindow.targetDom = $this;
+                            cWindow.appendToolContent = cbAppendToolContent;
+                        });
                     });
                 };
 
