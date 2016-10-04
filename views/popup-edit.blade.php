@@ -154,7 +154,7 @@
                 var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
                 var zoom = map.getZoom();
 
-                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" style="width:' + width + ';height:' + height + '"></div>', function() {
+                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" data-zoom="' + zoom + '" style="width:' + width + ';height:' + height + '"></div>', function() {
 
                     var loadCallback = function() {
 
