@@ -43,7 +43,11 @@ class GoogleMapTool extends AbstractTool
             })();
         </script>
         ")->load();
-        XeFrontend::js(asset($this->getAssetsPath() . '/googleMapTool.js?key=' . $config->get('key')))->load();
+        XeFrontend::js([
+            'http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'),
+            asset($this->getAssetsPath() . '/googleMapTool.js'),
+            asset($this->getAssetsPath() . '/googleMapRenderer.js?key=' . $config->get('key'))
+        ])->load();
     }
 
     public function getIcon()
@@ -53,7 +57,8 @@ class GoogleMapTool extends AbstractTool
 
     public static function getInstanceSettingURI($instanceId)
     {
-        return route('settings.plugin.google_map_tool.setting', $instanceId);
+        return null;
+//        return route('settings.plugin.google_map_tool.setting', $instanceId);
     }
 
     public static function getKey($instanceId)
@@ -65,40 +70,14 @@ class GoogleMapTool extends AbstractTool
     {
         $config = $this->configs->getOrNew('google_map_tool');
 
-        //TODO:: api key
-        XeFrontend::js('http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'))->load();
+        XeFrontend::js([
+            'http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'),
+            asset($this->getAssetsPath() . '/googleMapRenderer.js?key=' . $config->get('key'))
+        ])->load();
         XeFrontend::html('google_map_tool.render')->content("
         <script>
-            function googleMapRender(dom)
-            {
-                var lat = $(dom).data('lat');
-                var lng = $(dom).data('lng');
-                var text = $(dom).data('text');
-            
-                var map = new google.maps.Map(dom, {
-                    center: new google.maps.LatLng(lat, lng),
-                    zoom: 10,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                });
-            
-                var myLatLng = new google.maps.LatLng(lat, lng);
-                var marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map
-                });
-            
-                var infowindow = new google.maps.InfoWindow({
-                    content: text
-                });
-            
-                infowindow.open(map, marker);
-            }
-            
-            
             $(function() {
-                $('[data-googlemap]').each(function () {
-                    googleMapRender(this);
-                });
+                $('[data-googlemap]').renderer();
             });
         </script>
         ")->load();

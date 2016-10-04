@@ -44,7 +44,7 @@ class SettingsController extends Controller
 
     public function postGlobal(Request $request)
     {
-        XeConfig::set('google_map_tool', $request->only(['key']));
+        XeConfig::set('google_map_tool', $request->only(['key', 'lat', 'lng', 'zoom']));
 
         return redirect()->back();
     }
