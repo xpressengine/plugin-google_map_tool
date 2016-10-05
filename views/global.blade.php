@@ -1,9 +1,11 @@
+@if ($config->get('key'))
 {{
 XeFrontend::js([
     'http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'),
     asset('plugins/google_map_tool/assets/googleMapRenderer.js?key=' . $config->get('key'))
 ])->load()
 }}
+@endif
 
 @section('page_title')
     <h2>Editor 구글맵 설정</h2>
@@ -38,7 +40,7 @@ XeFrontend::js([
                                 <input type="text" class="form-control" name="key" value="{{ $config->get('key') }}">
                             </div>
                         </div>
-                        <div class="col-sm-12">
+                        <div class="col-sm-11">
                             <div class="form-group">
                                 <div class="clearfix">
                                     <label>
@@ -46,7 +48,15 @@ XeFrontend::js([
                                         <small>지도가 보여질 최초 좌표와 줌 레벨을 설정합니다.</small>
                                     </label>
                                 </div>
-                                <div id="map-wrapper" style="height: 400px"></div>
+                                @if ($config->get('key'))
+                                    <div id="map-wrapper" style="height: 400px"></div>
+                                @else
+                                        <div class="panel">
+                                            <div class="panel-body">
+                                                API Key 등록 후 설정할 수 있습니다.
+                                            </div>
+                                        </div>
+                                @endif
                                 <input type="hidden" name="lat" value="{{ $config->get('lat', '37.566535') }}">
                                 <input type="hidden" name="lng" value="{{ $config->get('lng', '126.97796919999996') }}">
                                 <input type="hidden" name="zoom" value="{{ $config->get('zoom', 10) }}">
@@ -66,6 +76,7 @@ XeFrontend::js([
     </div>
 </div>
 
+@if ($config->get('key'))
 <script type="text/javascript">
     $(function () {
         var lat = $('input[name="lat"]').val(),
@@ -93,7 +104,4 @@ XeFrontend::js([
         });
     });
 </script>
-
-<!--
- 기본 좌표, 줌 레벨
- -->
+@endif
