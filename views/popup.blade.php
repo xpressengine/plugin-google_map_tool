@@ -125,6 +125,7 @@
             appendToEditor: function() {
                 var lat = marker.getPosition().lat();
                 var lng = marker.getPosition().lng();
+                var text = $('#content').val();
 
                 var editorDoc = self.targetEditor.document.$;
                 var editorWindow = self.targetEditor.window.$;

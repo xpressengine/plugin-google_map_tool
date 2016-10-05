@@ -129,6 +129,8 @@
             appendToEditor: function() {
                 var lat = marker.getPosition().lat();
                 var lng = marker.getPosition().lng();
+                var text = $('#content').val();
+
                 var editorWindow = self.targetEditor.window.$;
 
                 var width = $('#hSize').val() + $('#hSize').parent().find('.text-measure').text();
@@ -138,7 +140,14 @@
                 var parentWin = opener;
                 var childWin = self;
 
-                $targetDom.empty().data({
+                $targetDom.empty().attr({
+                    'data-width': width,
+                    'data-height': height,
+                    'data-text': text,
+                    'data-lat': lat,
+                    'data-lng': lng,
+                    'data-zoom': zoom
+                }).data({
                     'width': width,
                     'height': height,
                     'text': text,
