@@ -59,7 +59,7 @@
                 return (c=='x' ? r : (r&0x3|0x8)).toString(16);
             });
             return uuid;
-        }
+        };
 
         return {
             init: function() {
@@ -85,8 +85,6 @@
                 infowindow.open(map, marker);
 
                 selfObj.bindEvent();
-
-                return this;
             },
             bindEvent: function() {
                 google.maps.event.addListener(map, 'click', function(event) {
@@ -135,8 +133,39 @@
                 var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
                 var zoom = map.getZoom();
 
-                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" data-zoom="' + zoom + '" style="width:' + width + ';height:' + height + '"></div>', function() {
-                    $(editorDoc.getElementById('googlemap_' + uuid)).renderer({win: editorWindow});
+                var dom = [
+                    '<div xe-tool-id="editortool/googlemap@googlemap"',
+                        ' id="googlemap_' + uuid + '"',
+                        ' contenteditable="true" data-googlemap',
+                        ' data-width="' + width + '"',
+                        ' data-height="' + height + '"',
+                        ' data-text="' + text + '"',
+                        ' data-lat="' + lat + '"',
+                        ' data-lng="' + lng + '"',
+                        ' data-zoom="' + zoom + '"',
+                        ' style="width:' + width + ';height:' + height + '"></div>'
+                ].join('\n');
+
+                var parentWin = opener;
+                var childWin = self;
+
+                appendToolContent(dom, function() {
+                    $(editorDoc.getElementById('googlemap_' + uuid)).renderer({
+                        win: editorWindow,
+                        callback: function(target) {
+                            var $btn = $('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>').on('click', function() {
+                                var cWindow = parentWin.open(parentWin.googleToolURL.get('edit_popup'), 'editPopup', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
+
+                                $(cWindow).on('load', function() {
+                                    cWindow.targetEditor = childWin.targetEditor;
+                                    cWindow.$targetDom = $(target);
+                                });
+                            });
+
+                            $(target).prepend($btn);
+
+                        }
+                    });
                     self.close();
                 });
             },
@@ -167,7 +196,7 @@
 
                 return true;
             }
-        }
+        };
     })().init();
 
 </script>
