@@ -5,8 +5,6 @@
 </style>
 <!-- TODO:: api key 백엔드에서 받아야함 -->
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
-<script src="http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}"></script>
 
 <div id="container">
     <div id="mapWrapper"></div>
@@ -45,79 +43,21 @@
 <script type="text/javascript">
 
     (function() {
+
         var defaultText = '입력하세요';
         var text = '', mapWidth = 0, mapHeight = 0;
         var selfObj;
         var map, marker, infowindow;
 
-        var _jsLoad = function(targetDoc, src, load, error) {
-            var el = targetDoc.createElement( 'script' );
-
-            el.src = src;
-            el.async = true;
-
-            if(load) {
-                el.onload = load;
-            }
-
-            if(error) {
-                el.onerror = error;
-            }
-
-            targetDoc.head.appendChild(el);
-        };
-
-        var _generateUUID = function() {
-            var d = new Date().getTime();
-            if(window.performance && typeof window.performance.now === "function"){
-                d += performance.now(); //use high-precision timer if available
-            }
-            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = (d + Math.random()*16)%16 | 0;
-                d = Math.floor(d/16);
-                return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-
         return {
             init: function() {
                 selfObj = this;
 
-                var myLatLng = new google.maps.LatLng('37.566535', '126.97796919999996');
-
-                map = new google.maps.Map(document.getElementById('mapWrapper'), {
-                    center: new google.maps.LatLng('37.566535', '126.97796919999996'),
-                    zoom: 10,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                });
-
-                marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map
-                });
-
-                infowindow = new google.maps.InfoWindow({
-                    content: defaultText
-                });
-
-                infowindow.open(map, marker);
-
                 selfObj.bindEvent();
-
-                return this;
             },
             bindEvent: function() {
-                google.maps.event.addListener(map, 'click', function(event) {
-                    marker.setPosition(event.latLng);
-//                    map.setCenter(event.latLng);
-                });
-
-                google.maps.event.addListener(marker, 'click', function() {
-                    infowindow.open(map, marker);
-                });
-
                 $(window).on('load', selfObj.preventReloading);
+                $(window).on('load', selfObj.resetValue);
                 $('#content').on('keyup', selfObj.setContent);
                 $('#checkFullWidth').on('change', selfObj.checkFullWidth);
                 $('#btnAppendToEditor').on('click', function() {
@@ -127,10 +67,53 @@
                 });
             },
             preventReloading: function() {
-                if(!self.appendToolContent) {
+                if(!self.$targetDom) {
                     alert('팝업을 재실행 하세요.');
                     self.close();
                 }
+            },
+            resetValue: function() {
+                var zoom = self.$targetDom.data('zoom');
+                var lat = self.$targetDom.data('lat');
+                var lng = self.$targetDom.data('lng');
+                var text = self.$targetDom.data('text');
+                var width = self.$targetDom.data('width');
+                var height = self.$targetDom.data('height');
+
+                var myLatLng = new google.maps.LatLng(lat, lng);
+
+                map = new google.maps.Map(document.getElementById('mapWrapper'), {
+                    center: new google.maps.LatLng(lat, lng),
+                    zoom: zoom || 10,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map
+                });
+
+                infowindow = new google.maps.InfoWindow({
+                    content: text
+                });
+
+                infowindow.open(map, marker);
+
+                if(parseInt(width) === 100 && width.substr(-1) === '%') {
+                    $('#checkFullWidth').prop('checked', true).trigger('change');
+                }
+
+                $('#hSize').val(parseInt(width));
+                $('#vSize').val(parseInt(height));
+                $('#content').val(text);
+
+                google.maps.event.addListener(map, 'click', function(event) {
+                    marker.setPosition(event.latLng);
+                });
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
+                });
             },
             setContent: function(e) {
                 var $this = $(this);
@@ -146,46 +129,51 @@
             appendToEditor: function() {
                 var lat = marker.getPosition().lat();
                 var lng = marker.getPosition().lng();
+                var text = $('#content').val();
 
-                var editorDoc = self.targetEditor.document.$;
                 var editorWindow = self.targetEditor.window.$;
-                var uuid = _generateUUID();
+
                 var width = $('#hSize').val() + $('#hSize').parent().find('.text-measure').text();
                 var height = $('#vSize').val() + $('#vSize').parent().find('.text-measure').text();
                 var zoom = map.getZoom();
 
-                appendToolContent('<div xe-tool-id="editortool/googlemap@googlemap" id="googlemap_' + uuid + '" contenteditable="true" data-googlemap data-text="' + text + '" data-lat="' + lat + '" data-lng="' + lng + '" data-zoom="' + zoom + '" style="width:' + width + ';height:' + height + '"></div>', function() {
+                var parentWin = opener;
+                var childWin = self;
 
-                    var loadCallback = function() {
+                $targetDom.empty().attr({
+                    'data-width': width,
+                    'data-height': height,
+                    'data-text': text,
+                    'data-lat': lat,
+                    'data-lng': lng,
+                    'data-zoom': zoom
+                }).data({
+                    'width': width,
+                    'height': height,
+                    'text': text,
+                    'lat': lat,
+                    'lng': lng,
+                    'zoom': zoom
+                }).css({
+                    width: width,
+                    height: height
+                }).renderer({
+                    win: editorWindow,
+                    callback: function(target) {
+                        var $btn = $('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>').on('click', function() {
+                            var cWindow = parentWin.open(parentWin.googleToolURL.get('edit_popup'), 'editPopup', "width=750,height=930,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no");
 
-                        var map = new editorWindow.google.maps.Map(editorDoc.getElementById('googlemap_' + uuid), {
-                            center: new editorWindow.google.maps.LatLng(lat, lng),
-                            zoom: zoom,
-                            mapTypeId: editorWindow.google.maps.MapTypeId.ROADMAP
+                            $(cWindow).on('load', function() {
+                                cWindow.targetEditor = childWin.targetEditor;
+                                cWindow.$targetDom = $(target);
+                            });
                         });
 
-                        var myLatLng = new editorWindow.google.maps.LatLng(lat, lng);
-                        var marker = new editorWindow.google.maps.Marker({
-                            position: myLatLng,
-                            map: map
-                        });
-
-                        editorWindow.infowindow = new editorWindow.google.maps.InfoWindow({
-                            content: text
-                        });
-
-                        editorWindow.infowindow.open(map, marker);
-
-                        self.close();
-
-                    };
-
-                    if(editorWindow.google) {
-                        loadCallback();
-                    }else {
-                        _jsLoad(editorDoc, 'http://maps.googleapis.com/maps/api/js?key={{ $config->get('key') }}', loadCallback);
+                        $(target).prepend($btn);
+                        childWin.close();
                     }
                 });
+
             },
             checkFullWidth: function() {
                 var $this = $(this);
@@ -214,7 +202,8 @@
 
                 return true;
             }
-        }
+        };
     })().init();
+
 
 </script>

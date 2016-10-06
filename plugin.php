@@ -78,6 +78,11 @@ class Plugin extends AbstractPlugin
 
                             $config = \XeConfig::getOrNew('google_map_tool');
 
+                            XeFrontend::js([
+                                'http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'),
+                                $this->asset('assets/googleMapRenderer.js?key=' . $config->get('key'))
+                            ])->appendTo('head')->load();
+
                             // output
                             return XePresenter::make('google_map_tool::views.popup-edit', ['config' => $config]);
 
