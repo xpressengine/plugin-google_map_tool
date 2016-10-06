@@ -21,7 +21,7 @@
     };
 
     var getParam = function (name) {
-        var qs = $('script[src="'+scriptName+'"]').attr('src').replace(/^[^\?]+\??/, '');
+        var qs = scriptName.replace(/^[^\?]+\??/, '');
 
         return (function (query) {
             var params = {};
@@ -59,7 +59,7 @@
 
             var map = new win.google.maps.Map(tar, {
                 center: new win.google.maps.LatLng(lat, lng),
-                zoom: 10,
+                zoom: zoom,
                 mapTypeId: win.google.maps.MapTypeId.ROADMAP
             });
 

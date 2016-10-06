@@ -3,6 +3,7 @@
 namespace Xpressengine\Plugins\GoogleMapTool;
 use App\Facades\XeFrontend;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Symfony\Component\DomCrawler\Crawler;
 use Xpressengine\Config\ConfigManager;
 use Xpressengine\Editor\AbstractTool;
 use Xpressengine\Permission\Instance;
@@ -75,19 +76,31 @@ class GoogleMapTool extends AbstractTool
             'http://maps.googleapis.com/maps/api/js?key=' . $config->get('key'),
             asset($this->getAssetsPath() . '/googleMapRenderer.js?key=' . $config->get('key'))
         ])->load();
-        XeFrontend::html('google_map_tool.render')->content("
-        <script>
-            $(function() {
-                $('[data-googlemap]').renderer();
-            });
-        </script>
-        ")->load();
 
-        return $content;
+        $crawler = $this->createCrawler($content);
+        $crawler->filter('*[xe-tool-id="editortool/googlemap@googlemap"]')->each(function (Crawler $node, $i) {
+            $dom = $node->getNode(0);
+            $script = $dom->ownerDocument->createElement('script');
+            $txt = $dom->ownerDocument->createTextNode('$(function() { $("#' . $node->attr('id') . '").renderer(); })');
+            $script->appendChild($txt);
+            $dom->appendChild($script);
+
+            $node->add($dom);
+        });
+
+        return $crawler->getNode(0)->ownerDocument->saveHTML($crawler->getNode(0));
         
     }
     private function getAssetsPath()
     {
         return str_replace(base_path(), '', realpath(__DIR__ . '/../assets'));
+    }
+
+    private function createCrawler($content)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($content);
+
+        return $crawler;
     }
 }
