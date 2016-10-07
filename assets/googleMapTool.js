@@ -15,6 +15,7 @@ XEeditor.tools.define({
         },
         beforeSubmit: function(targetEditor) {
             $(targetEditor.document.$.querySelectorAll('[data-googlemap]')).empty();
+            targetEditor.updateElement();
         },
         editorLoaded: function(targetEditor) {
             var editorWindow = targetEditor.window.$;
