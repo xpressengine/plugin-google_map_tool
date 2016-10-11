@@ -157,7 +157,7 @@
                 }).css({
                     width: width,
                     height: height
-                }).renderer({
+                }).googleMapRender({
                     win: editorWindow,
                     callback: function(target) {
                         var $btn = $('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>').on('click', function() {

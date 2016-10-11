@@ -45,7 +45,7 @@
         })(qs);
     };
     
-    $.fn['renderer'] = function (options) {
+    $.fn['googleMapRender'] = function (options) {
         var options = options || {},
             win = options.win || window,
             callback = options.callback || function () {},

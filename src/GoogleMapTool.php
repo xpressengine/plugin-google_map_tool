@@ -81,7 +81,8 @@ class GoogleMapTool extends AbstractTool
         $crawler->filter('*[xe-tool-id="editortool/googlemap@googlemap"]')->each(function (Crawler $node, $i) {
             $dom = $node->getNode(0);
             $script = $dom->ownerDocument->createElement('script');
-            $txt = $dom->ownerDocument->createTextNode('$(function() { $("#' . $node->attr('id') . '").renderer(); })');
+            $txt = $dom->ownerDocument
+                ->createTextNode('$(function() { $("#' . $node->attr('id') . '").googleMapRender(); })');
             $script->appendChild($txt);
             $dom->appendChild($script);
 

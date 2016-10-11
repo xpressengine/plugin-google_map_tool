@@ -152,7 +152,7 @@
                 var childWin = self;
 
                 appendToolContent(dom, function() {
-                    $(editorDoc.getElementById('googlemap_' + uuid)).renderer({
+                    $(editorDoc.getElementById('googlemap_' + uuid)).googleMapRender({
                         win: editorWindow,
                         callback: function(target) {
                             var $btn = $('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>').on('click', function() {

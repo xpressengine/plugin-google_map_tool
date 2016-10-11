@@ -21,7 +21,7 @@ XEeditor.tools.define({
             var editorWindow = targetEditor.window.$;
 
             if($(targetEditor.document.$.querySelectorAll('[data-googlemap]')).length > 0) {
-                $(targetEditor.document.$.querySelectorAll('[data-googlemap]')).renderer({
+                $(targetEditor.document.$.querySelectorAll('[data-googlemap]')).googleMapRender({
                     win: editorWindow,
                     callback: function (el) {
                         $(el).prepend('<button type="button" class="btnEditMap" style="position:absolute;z-index:1;left:0;top:0">Edit</button>');
