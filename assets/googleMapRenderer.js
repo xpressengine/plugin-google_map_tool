@@ -84,7 +84,7 @@
             });
         };
 
-        if(win.google) {
+        if(win.google && win.google.maps) {
             act();
         } else {
             _jsLoad(win.document, 'http://maps.googleapis.com/maps/api/js?key=' + getParam('key'), act);

@@ -137,7 +137,8 @@
                 var dom = [
                     '<div xe-tool-id="editortool/googlemap@googlemap"',
                         ' id="googlemap_' + uuid + '"',
-                        ' contenteditable="true" data-googlemap',
+//                        ' contenteditable="true" data-googlemap',
+                        ' data-googlemap',
                         ' data-width="' + width + '"',
                         ' data-height="' + height + '"',
                         ' data-text="' + text + '"',
