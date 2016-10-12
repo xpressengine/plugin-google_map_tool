@@ -135,7 +135,7 @@
                 var zoom = map.getZoom();
 
                 var dom = [
-                    '<div xe-tool-id="editortool/googlemap@googlemap"',
+                    '<div ',
                         ' id="googlemap_' + uuid + '"',
 //                        ' contenteditable="true" data-googlemap',
                         ' data-googlemap',
