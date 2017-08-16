@@ -73,12 +73,13 @@
                 }
             },
             resetValue: function() {
-                var zoom = self.$targetDom.data('zoom');
-                var lat = self.$targetDom.data('lat');
-                var lng = self.$targetDom.data('lng');
-                var text = self.$targetDom.data('text');
-                var width = self.$targetDom.data('width');
-                var height = self.$targetDom.data('height');
+                var toolData = JSON.parse(self.$targetDom.attr('xe-tool-data').replace(/'/g, '"'));
+                var lat = toolData.lat;
+                var lng = toolData.lng;
+                var text = toolData.text;
+                var zoom = toolData.zoom || 10;
+                var width = toolData.width;
+                var height = toolData.height;
 
                 var myLatLng = new google.maps.LatLng(lat, lng);
 
@@ -140,21 +141,17 @@
                 var parentWin = opener;
                 var childWin = self;
 
-                $targetDom.empty().attr({
-                    'data-width': width,
-                    'data-height': height,
-                    'data-text': text,
-                    'data-lat': lat,
-                    'data-lng': lng,
-                    'data-zoom': zoom
-                }).data({
-                    'width': width,
-                    'height': height,
-                    'text': text,
-                    'lat': lat,
-                    'lng': lng,
-                    'zoom': zoom
-                }).css({
+                var toolData = JSON.stringify({
+                    width: width,
+                    height: height,
+                    text: text,
+                    lat: lat,
+                    lng: lng,
+                    zoom: zoom
+                }).replace(/"/g, "'");
+
+                $targetDom.empty().attr('xe-tool-data', toolData)
+                .css({
                     width: width,
                     height: height
                 }).googleMapRender({
